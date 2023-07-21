@@ -29,10 +29,10 @@
       </div>
 
       <div class="flex items-center justify-end w-full gap-2">
-        <button class="flex items-center border rounded-sm px-3 py-[6px] hover:bg-gray-100">
+        <NuxtLink to="/cargar" class="flex items-center border rounded-sm px-3 py-[6px] hover:bg-gray-100">
           <Icon name="mdi:plus" size="22"></Icon>
-          <NuxtLink to="/cargar"> <span class="px-2 font-medium text-[15px]">Cargar</span> </NuxtLink>
-        </button>
+          <span class="px-2 font-medium text-[15px]">Cargar</span>
+        </NuxtLink>
         <button v-if="false" class="flex items-center bg-[#F02C56] text-white border rounded-lg px-3 py-[6px] ml-3">
           <span class="mx-3 font-medium text-[15px]">Log in</span>
         </button>
@@ -55,7 +55,7 @@
             class="absolute bg-white rounded-lg py-1.5 w-[200px] shadow-xl border top-[43px] -right-2"
             id="popup-menu"
             >
-              <NuxtLink @click="showMenu=false" to="/" class="flex items-center justify-start py-3 px-2 hover:bg-gray-100 cursor-pointer">
+              <NuxtLink @click="showMenu=false" to="/perfil/1" class="flex items-center justify-start py-3 px-2 hover:bg-gray-100 cursor-pointer">
                 <Icon name="ph:user" size="20"></Icon>
                 <span class="pl-2 font-semibold text-sm">Perfil</span>
               </NuxtLink>
