@@ -1,24 +1,20 @@
 <template>
   <div>
     <NuxtLayout>
-      <NuxtPage>
-
-      </NuxtPage>
+      <NuxtPage />
+      <auth-overlay />
     </NuxtLayout>
   </div>
 </template>
 <script setup lang="ts">
-
 useHead({
-  title: 'mediaRed',
-  link:[
+  title: "mediaRed",
+  link: [
     {
-      rel:"icon",
-      type:'image/x-icon',
-      href: '/images/logo-red.png'
-    }
-  ]
-})
-
-
+      rel: "icon",
+      type: "image/x-icon",
+      href: "/images/logo-red.png",
+    },
+  ],
+});
 </script>
