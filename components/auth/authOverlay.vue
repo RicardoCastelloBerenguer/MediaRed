@@ -7,7 +7,10 @@
       class="relative bg-white w-full max-w-[470px] h-[70%] p-4 rounded-lg"
     >
       <div class="w-full flex justify-end">
-        <button class="p-1.5 rounded-full bg-gray-100">
+        <button
+          @click="showAuthOverlayComputed = false"
+          class="p-1.5 rounded-full bg-gray-100"
+        >
           <Icon name="mdi:close" size="26" color="" class="" />
         </button>
       </div>
@@ -22,16 +25,28 @@
           @click="isRegister = !isRegister"
           class="text-[14px] text-[#f02c56] font-semibold pl-1"
         >
-          <span v-if="isRegister">Sign up</span>
+          <span v-if="!isRegister">Sign up</span>
           <span v-else>Log in</span>
         </button>
       </div>
-
-      <login />
+      <register v-if="isRegister" />
+      <login v-else />
     </section>
   </main>
 </template>
 
 <script setup>
+import register from "~/components/auth/register.vue";
+import login from "~/components/auth/login.vue";
+
+const emit = defineEmits(["update:showAuthOverlay"]);
+const props = defineProps({ showAuthOverlay: Boolean });
+const { showAuthOverlay } = toRefs(props);
+
 let isRegister = ref(false);
+
+const showAuthOverlayComputed = computed({
+  get: () => showAuthOverlay.value,
+  set: (val) => emit("update:showAuthOverlay", val),
+});
 </script>

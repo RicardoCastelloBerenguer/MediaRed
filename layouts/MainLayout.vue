@@ -1,25 +1,21 @@
 <template>
-
   <!--  Top Navbar  !-->
 
-  <TopNav/>
+  <TopNav />
 
   <!--  SideBar  !-->
 
   <div :class="route.fullPath === '/' ? 'max-w-[1140px]' : ''">
-    <SideNav/>
+    <SideNav />
   </div>
 
-  <slot/>
+  <slot />
 
   <!--  Main Content  !-->
-
 </template>
 
 <script setup>
-
 import PostMain from "~/components/core/PostMain.vue";
 
-const route = useRoute()
-
+const route = useRoute();
 </script>
