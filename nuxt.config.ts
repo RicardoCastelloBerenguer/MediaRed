@@ -10,4 +10,10 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  components: [
+    {
+      path: "~/components", // Ruta base para los componentes
+      pathPrefix: false,
+    },
+  ],
 });

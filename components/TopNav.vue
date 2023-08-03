@@ -44,7 +44,8 @@
           <span class="px-2 font-medium text-[15px]">Cargar</span>
         </NuxtLink>
         <button
-          v-if="false"
+          @click="$generalStore.isLoginOpen = true"
+          v-if="!$userStore.id"
           class="flex items-center bg-[#F02C56] text-white border rounded-lg px-3 py-[6px] ml-3"
         >
           <span class="mx-3 font-medium text-[15px]">Log in</span>
@@ -56,7 +57,7 @@
         </button>
         !-->
 
-        <div class="flex items-center">
+        <div v-else class="flex items-center">
           <Icon
             class="ml-1 mr-4"
             name="carbon:send-alt"
@@ -109,6 +110,8 @@
 
 <script setup>
 const route = useRoute();
+
+const { $userStore, $generalStore } = useNuxtApp();
 
 let showMenu = ref(false);
 </script>
