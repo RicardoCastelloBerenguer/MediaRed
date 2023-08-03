@@ -1,5 +1,5 @@
 <template>
-  <div id="PostMain" class="flex border-b py-6">
+  <div id="PostMain" class="flex justify-center border-b py-6">
     <img
       class="cursor-pointer rounded-full mx-0 max-h-[60px]"
       width="60"

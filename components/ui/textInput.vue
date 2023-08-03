@@ -21,7 +21,10 @@ const props = defineProps({
   autoFocus: Boolean,
   error: String,
   placeholder: String,
-  inputType: String,
+  inputType: {
+    type: String,
+    default: "text",
+  },
   maxlength: {
     type: Number,
     default: 30,

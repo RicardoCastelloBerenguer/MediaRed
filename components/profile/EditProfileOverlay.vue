@@ -15,11 +15,199 @@
           <Icon name="mdi:close" size="25" />
         </button>
       </div>
+
+      <div
+        class="h-[calc-(500px-200px)]"
+        :class="!uploadedImage ? 'mt-16' : 'mt-[58px]'"
+      >
+        <div v-if="!uploadedImage" class="">
+          <div
+            id="ProfilePhotoSection"
+            class="flex flex-col border-b sm:h-[145px] px-1.5 py-2 w-full"
+          >
+            <label
+              class="sm:text-left text-center font-semibold text-[15px] sm:mb-0 mb-1 text-gray-700 sm:w-[160px]"
+              >Profile Photo</label
+            >
+            <div class="flex items-center justify-center sm:-mt-6">
+              <label for="image" class="relative cursor-pointer">
+                <img
+                  src="https:picsum.photos/id/8/300/320"
+                  alt="profile image"
+                  width="95"
+                  class="rounded-full"
+                />
+
+                <div
+                  class="absolute bottom-0 right-0 rounded-full bg-white shadow-xl border p-1 border-gray-300 inline-block w-[32px]"
+                >
+                  <Icon
+                    name="ph:pencil-simple-line-bold"
+                    size="17"
+                    color=""
+                    class="-mt-1 ml-0.5"
+                  />
+                </div>
+              </label>
+
+              <input
+                class="hidden"
+                type="file"
+                name=""
+                id="image"
+                @input="getUploadedImage"
+                accept="image/png, image/jpeg, image/jpg,"
+              />
+            </div>
+          </div>
+          <div
+            id="UsernameSection"
+            class="flex flex-col border-b sm:h-[118px] px-1.5 py-2 mt-1.5 w-full"
+          >
+            <label
+              class="font-semibold text-[15px] sm:mb-0 text-gray-700 sm:w-[160px] sm:text-left text-center"
+              >Username
+            </label>
+
+            <div class="flex items-center justify-center sm:-mt-6">
+              <div class="sm:w-[60%] w-full max-w-md">
+                <TextInput
+                  placeholder="Username"
+                  :auto-focus="true"
+                  input-type="text"
+                  v-model="username"
+                  max="30"
+                />
+                <p class="text-[11px] text-gray-400 mt-4">
+                  Usernames can only contain letters, numbers, underscores and
+                  periods. <br />
+                  Changing your username will also change your profile link
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="BioSection"
+            class="flex flex-col sm:h[120px] px-1.5 py-2 mt-2 w-full"
+          >
+            <span
+              class="font-semibold text[15px] sm:mb-0 mb-1 text-gray-700 sm:w-[160px] sm:text-left text-center"
+            >
+              Bio
+            </span>
+
+            <div class="flex items-center justify-center sm:-mt-6">
+              <div class="sm:w-[60%] w-full max-w-[md]">
+                <textarea
+                  class="resize-none w-full bg-[#f1f1f2] text-gray-800 border border-gray-300 rounded-md py-2.5 px-3 focus:outline-none"
+                  name=""
+                  id=""
+                  cols="30"
+                  rows="4"
+                  v-model="userBio"
+                  maxlength="80"
+                ></textarea>
+
+                <div v-if="userBio" class="text-[11px] text-gray-500">
+                  {{ userBio.length }}/80
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <section v-else class="w-full h-[430px]">
+          <!-- <Crooper
+            class="h-[430px]"
+            ref="crooper"
+            :stencil-component="CircleStencil"
+            :src="uploadedImage"
+          /> -->
+
+          <!-- ref="crooper"
+          :stencil-component="CircleStencil" :src="uploadedImage" " /> -->
+
+          <cropper
+            class="h-[430px]"
+            :src="uploadedImage"
+            :stencil-component="CircleStencil"
+            ref="crooper"
+          />
+        </section>
+      </div>
+
+      <section
+        id="ButtonSection"
+        class="absolute p-5 bottom-0 border-t border-t-gray-300 w-full"
+      >
+        <div
+          v-if="!uploadedImage"
+          id="UpdateInfoButtons"
+          class="flex items-center justify-end"
+        >
+          <button
+            @click="$generalStore.isEditProfileOpen = false"
+            class="flex items-center border px-3 py-[6px] hover:bg-gray-100 rounded-md"
+          >
+            <span class="text-[15px] px-2 font-medium">Cancel</span>
+          </button>
+
+          <button
+            @click="cropAndUpdateImage()"
+            class="flex items-center bg-[#f02c56] text-white border ml-3 px-3 py-[6px] rounded-md"
+          >
+            <span class="text-[15px] px-2 font-medium">Apply</span>
+          </button>
+        </div>
+      </section>
     </section>
   </main>
 </template>
 <script setup>
-let uploadedImage = ref(null);
+import { storeToRefs } from "pinia";
+import { Cropper, CircleStencil } from "vue-advanced-cropper";
+import "vue-advanced-cropper/dist/style.css";
 
-const { $generalStore } = useNuxtApp();
+let uploadedImage = ref(null);
+let userBio = ref("");
+let userImage = ref(null);
+let isUpdated = ref(false);
+let file = ref(null);
+let username = ref("");
+let crooper = ref(null);
+let UploadedImage = ref(null);
+
+const { $generalStore, $userStore, $profileStore } = useNuxtApp();
+
+const { name, bio, image } = storeToRefs($userStore);
+
+onMounted(() => {
+  (username.value = name.value),
+    (userBio.value = bio.value),
+    (userImage.value = image.value);
+});
+
+watch(
+  () => username.value,
+  () => {
+    if (!username || username.value === name.value) isUpdated.value = false;
+    else isUpdated.value = true;
+  }
+);
+
+watch(
+  () => userBio.value,
+  () => {
+    if (!userBio || userBio.value.length === bio.value.length)
+      isUpdated.value = false;
+    else isUpdated.value = true;
+  }
+);
+
+const getUploadedImage = (e) => {
+  file.value = e.target.files[0];
+  uploadedImage.value = URL.createObjectURL(file.value);
+};
+
+const cropAndUpdateImage = () => {};
 </script>

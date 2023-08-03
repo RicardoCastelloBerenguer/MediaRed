@@ -4,7 +4,7 @@
       <NuxtPage />
 
       <AuthOverlay v-if="$generalStore.isLoginOpen" />
-      <EditProfileOverlay />
+      <EditProfileOverlay v-if="$generalStore.isEditProfileOpen" />
     </NuxtLayout>
   </div>
 </template>
