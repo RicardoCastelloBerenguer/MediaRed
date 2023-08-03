@@ -98,7 +98,6 @@
 
 <script setup>
 import MainLayout from "~/layouts/MainLayout.vue";
-import UserPost from "~/components/core/UserPost.vue";
 </script>
 
 <style lang="scss" scoped></style>

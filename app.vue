@@ -3,19 +3,25 @@
     <NuxtLayout>
       <NuxtPage />
 
-      <auth-overlay v-model:showAuthOverlay="showAuth" v-if="showAuth" />
+      <AuthOverlay v-if="$generalStore.isLoginOpen" />
+      <EditProfileOverlay />
     </NuxtLayout>
   </div>
 </template>
 <script setup lang="ts">
-let showAuth = ref(true);
+import { storeToRefs } from "pinia";
 
-watch(
-  () => showAuth.value,
-  () => {
-    console.log(showAuth.value);
-  }
-);
+const { $generalStore } = useNuxtApp();
+const { isLoginOpen } = storeToRefs($generalStore);
+
+// let showAuth = ref(true);
+
+// watch(
+//   () => showAuth.value,
+//   () => {
+//     console.log(showAuth.value);
+//   }
+// );
 
 useHead({
   title: "mediaRed",

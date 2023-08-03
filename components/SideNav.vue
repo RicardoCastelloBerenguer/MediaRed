@@ -76,8 +76,8 @@
 </template>
 
 <script setup>
-import MenuItem from "~/components/core/MenuItem.vue";
-import AccountItemFollow from "~/components/core/AccountItemFollow.vue";
+import MenuItem from "~/components/ui/MenuItem.vue";
+import AccountItemFollow from "~/components/ui/AccountItemFollow.vue";
 
 const route = useRoute();
 </script>

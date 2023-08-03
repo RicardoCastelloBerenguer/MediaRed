@@ -8,7 +8,7 @@
     >
       <div class="w-full flex justify-end">
         <button
-          @click="showAuthOverlayComputed = false"
+          @click="$generalStore.isLoginOpen = false"
           class="p-1.5 rounded-full bg-gray-100"
         >
           <Icon name="mdi:close" size="26" color="" class="" />
@@ -39,14 +39,16 @@
 import register from "~/components/auth/register.vue";
 import login from "~/components/auth/login.vue";
 
-const emit = defineEmits(["update:showAuthOverlay"]);
-const props = defineProps({ showAuthOverlay: Boolean });
-const { showAuthOverlay } = toRefs(props);
+const { $userStore, $generalStore } = useNuxtApp();
 
 let isRegister = ref(false);
 
-const showAuthOverlayComputed = computed({
-  get: () => showAuthOverlay.value,
-  set: (val) => emit("update:showAuthOverlay", val),
-});
+// const emit = defineEmits(["update:showAuthOverlay"]);
+// const props = defineProps({ showAuthOverlay: Boolean });
+// const { showAuthOverlay } = toRefs(props);
+
+// const showAuthOverlayComputed = computed({
+//   get: () => showAuthOverlay.value,
+//   set: (val) => emit("update:showAuthOverlay", val),
+// });
 </script>
