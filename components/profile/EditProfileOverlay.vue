@@ -20,7 +20,7 @@
         class="h-[calc-(500px-200px)]"
         :class="!uploadedImage ? 'mt-16' : 'mt-[58px]'"
       >
-        <div v-if="!uploadedImage" class="">
+        <section v-if="!uploadedImage" class="">
           <div
             id="ProfilePhotoSection"
             class="flex flex-col border-b sm:h-[145px] px-1.5 py-2 w-full"
@@ -115,7 +115,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </section>
         <section v-else class="w-full h-[430px]">
           <!-- <Crooper
             class="h-[430px]"

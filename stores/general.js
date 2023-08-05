@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 export const useGeneralStore = defineStore("general", {
   state: () => ({
     isLoginOpen: false,
-    isEditProfileOpen: true,
+    isEditProfileOpen: false,
     selectedPost: null,
     ids: null,
     isBackUrl: "/",
@@ -12,4 +12,5 @@ export const useGeneralStore = defineStore("general", {
     following: null,
   }),
   actions: {},
+  persist: true,
 });

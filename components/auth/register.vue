@@ -7,28 +7,30 @@
         placeholder="Full name"
         input-type="text"
         :auto-focus="true"
-        error=""
+        :error="errors && errors.name ? errors.name[0] : ''"
         v-model:input="name"
       />
       <text-input
         placeholder="Email address"
         input-type="email"
         :auto-focus="false"
-        error=""
+        :error="errors && errors.email ? errors.email[0] : ''"
         v-model:input="email"
       />
 
       <text-input
         placeholder="Password"
         input-type="password"
-        error=""
+        :error="errors && errors.password ? errors.password[0] : ''"
         v-model:input="password"
       />
 
       <text-input
         placeholder="Confirm Password"
         input-type="password"
-        error="this password doesn't match the previus one "
+        :error="
+          errors && errors.confirmPassword ? errors.confirmPassword[0] : ''
+        "
         v-model:input="confirmPassword"
       />
 
@@ -37,13 +39,13 @@
       </span>
       <div class="px-6 pb-2 mt-6">
         <button
+          @click="register()"
           :disabled="!name || !email || !password || !confirmPassword"
           :class="
             !name || !email || !password || !confirmPassword
               ? 'bg-gray-200'
               : 'bg-[#f02c56]'
           "
-          @click="register()"
           class="w-full text-[17px] font-semibold text-white py-3 rounded-sm"
         >
           Sign up
@@ -53,6 +55,8 @@
   </section>
 </template>
 <script setup>
+const { $userStore, $generalStore } = useNuxtApp();
+
 let name = ref(null);
 let email = ref(null);
 let password = ref(null);
@@ -66,5 +70,24 @@ watch(
   }
 );
 
-const register = () => {};
+const register = async () => {
+  try {
+    await $userStore.getTokens();
+
+    console.log(password.value + " | " + confirmPassword.value);
+
+    await $userStore.register(
+      name.value,
+      email.value,
+      password.value,
+      confirmPassword.value
+    );
+    await $userStore.getUser();
+
+    $generalStore.isLoginOpen = false;
+  } catch (error) {
+    console.log(error);
+    errors.value = error.response.data.errors;
+  }
+};
 </script>

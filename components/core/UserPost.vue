@@ -53,7 +53,7 @@ let video = ref(null);
 let isLoaded = ref(false);
 
 onMounted(() => {
-  console.log(video);
+  //console.log(video);
   video.value.addEventListener("loadeddata", (e) => {
     if (e.target) {
       setTimeout(() => {

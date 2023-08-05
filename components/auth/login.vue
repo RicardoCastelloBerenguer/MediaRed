@@ -7,13 +7,13 @@
         placeholder="Email address"
         input-type="email"
         :auto-focus="true"
-        error=""
+        :error="errors && errors.email ? errors.email[0] : ''"
         v-model:input="email"
       />
       <text-input
         placeholder="Password"
         input-type="password"
-        error="this is an password example error"
+        error=""
         v-model:input="password"
       />
 
@@ -34,6 +34,8 @@
   </section>
 </template>
 <script setup>
+const { $userStore, $generalStore } = useNuxtApp();
+
 let email = ref(null);
 let password = ref(null);
 let errors = ref(null);
@@ -41,9 +43,22 @@ let errors = ref(null);
 watch(
   () => email.value,
   () => {
-    console.log(email.value);
+    //console.log(email.value);
   }
 );
 
-const login = () => {};
+const login = async () => {
+  try {
+    errors.value = null;
+
+    await $userStore.getTokens();
+    await $userStore.login(email.value, password.value);
+    await $userStore.getUser();
+
+    $generalStore.isLoginOpen = false;
+  } catch (error) {
+    console.log(error);
+    errors.value = error.response.data.errors;
+  }
+};
 </script>

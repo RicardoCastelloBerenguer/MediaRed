@@ -36,13 +36,13 @@
       </div>
 
       <div class="flex items-center justify-end w-full gap-2">
-        <NuxtLink
-          to="/cargar"
+        <button
+          @click="isLoggedIn()"
           class="flex items-center border rounded-sm px-3 py-[6px] hover:bg-gray-100"
         >
           <Icon name="mdi:plus" size="22"></Icon>
           <span class="px-2 font-medium text-[15px]">Cargar</span>
-        </NuxtLink>
+        </button>
         <button
           @click="$generalStore.isLoginOpen = true"
           v-if="!$userStore.id"
@@ -57,7 +57,7 @@
         </button>
         !-->
 
-        <div v-else class="flex items-center">
+        <div v-if="$userStore.id" class="flex items-center">
           <Icon
             class="ml-1 mr-4"
             name="carbon:send-alt"
@@ -75,7 +75,7 @@
               <img
                 class="rounded-full"
                 width="33"
-                src="https:picsum.photos/id/13/300/320"
+                :src="$userStore.image"
                 alt=""
               />
             </button>
@@ -83,11 +83,11 @@
             <div
               v-if="showMenu"
               class="absolute bg-white rounded-lg py-1.5 w-[200px] shadow-xl border top-[43px] -right-2"
-              id="popup-menu"
+              id="PopupMenu"
             >
               <NuxtLink
                 @click="showMenu = false"
-                to="/perfil/1"
+                :to="`/perfil/${$userStore.id}`"
                 class="flex items-center justify-start py-3 px-2 hover:bg-gray-100 cursor-pointer"
               >
                 <Icon name="ph:user" size="20"></Icon>
@@ -95,6 +95,7 @@
               </NuxtLink>
 
               <div
+                @click="logout()"
                 class="flex items-center justify-start py-3 px-2 hover:bg-gray-100 border-t border-gray-100 cursor-pointer"
               >
                 <Icon name="ic:outline-login" size="20"></Icon>
@@ -110,8 +111,33 @@
 
 <script setup>
 const route = useRoute();
+const router = useRouter();
 
 const { $userStore, $generalStore } = useNuxtApp();
 
 let showMenu = ref(false);
+
+onMounted(() => {
+  document.addEventListener("mouseup", function (e) {
+    let popupMenu = document.getElementById("PopupMenu");
+    console.log(popupMenu);
+    if (!popupMenu.contains(e.target)) {
+      showMenu.value = false;
+    }
+  });
+});
+
+const isLoggedIn = () => {
+  if ($userStore.id) router.push("upload");
+  else $generalStore.isLoginOpen = true;
+};
+
+const logout = () => {
+  try {
+    $userStore.logout();
+    router.push("/");
+  } catch (error) {
+    console.log(error);
+  }
+};
 </script>
