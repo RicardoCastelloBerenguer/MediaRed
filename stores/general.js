@@ -1,4 +1,8 @@
 import { defineStore } from "pinia";
+import axios from "../plugins/axios";
+import { useUserStore } from "./user";
+
+const $axios = axios().provide.axios;
 
 export const useGeneralStore = defineStore("general", {
   state: () => ({
@@ -11,6 +15,31 @@ export const useGeneralStore = defineStore("general", {
     suggested: null,
     following: null,
   }),
-  actions: {},
+  actions: {
+    async hasSessionExpired() {
+      await $axios.interceptors.response.use(
+        ((response) => {
+          return response;
+        },
+        (error) => {
+          switch (error.response.status) {
+            case 401:
+            case 419:
+            case 401:
+              useUserStore().resetUser();
+              window.location.href = "/";
+              break;
+            case 500:
+              alert(
+                "Oops , something in our server is not going accordingly , wait until it is fixed thanks."
+              );
+              break;
+            default:
+              return Promise.reject(error);
+          }
+        })
+      );
+    },
+  },
   persist: true,
 });
