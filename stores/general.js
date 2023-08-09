@@ -22,11 +22,11 @@ export const useGeneralStore = defineStore("general", {
     },
     async hasSessionExpired() {
       await $axios.interceptors.response.use(
-        ((response) => {
+        (response) => {
           return response;
         },
         (error) => {
-          switch (error.response.status) {
+          switch (error.status) {
             case 401:
             case 419:
             case 401:
@@ -41,7 +41,7 @@ export const useGeneralStore = defineStore("general", {
             default:
               return Promise.reject(error);
           }
-        })
+        }
       );
     },
   },
