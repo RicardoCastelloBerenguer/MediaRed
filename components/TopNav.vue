@@ -124,7 +124,7 @@ onMounted(() => {
     if (!popupMenu.contains(e.target)) {
       showMenu.value = false;
     }
-  });       
+  });
 });
 
 const isLoggedIn = () => {

@@ -16,6 +16,10 @@ export const useGeneralStore = defineStore("general", {
     following: null,
   }),
   actions: {
+    bodySwitch(switchStopScroll) {
+      if (switchStopScroll) document.body.style.overflow = "hidden";
+      else document.body.style.overflow = "visible";
+    },
     async hasSessionExpired() {
       await $axios.interceptors.response.use(
         ((response) => {

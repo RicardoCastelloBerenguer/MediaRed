@@ -3,24 +3,45 @@
     <NuxtLayout>
       <NuxtPage />
 
-      <AuthOverlay v-if="$generalStore.isLoginOpen" />
-      <EditProfileOverlay v-if="$generalStore.isEditProfileOpen" />
+      <AuthOverlay v-if="isLoginOpen" />
+      <EditProfileOverlay v-if="isEditProfileOpen" />
     </NuxtLayout>
   </div>
 </template>
 <script setup lang="ts">
+import { userInfo } from "os";
 import { storeToRefs } from "pinia";
 
-const { $generalStore } = useNuxtApp();
-const { isLoginOpen } = storeToRefs($generalStore);
+const { $generalStore, $userStore } = useNuxtApp();
+const { isLoginOpen, isEditProfileOpen } = storeToRefs($generalStore);
 
 onMounted(async () => {
+  $generalStore.bodySwitch(false);
+  isLoginOpen.value = false;
+  isEditProfileOpen.value = false;
+
   try {
     await $generalStore.hasSessionExpired();
+
+    if ($userStore.id) $userStore.getUser();
   } catch (error) {
     console.log(error);
   }
 });
+
+watch(
+  () => isLoginOpen.value,
+  (val) => {
+    $generalStore.bodySwitch(val);
+  }
+);
+
+watch(
+  () => isEditProfileOpen.value,
+  (val) => {
+    $generalStore.bodySwitch(val);
+  }
+);
 
 // let showAuth = ref(true);
 
