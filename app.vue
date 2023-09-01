@@ -22,6 +22,8 @@ onMounted(async () => {
 
   try {
     await $generalStore.hasSessionExpired();
+    await $generalStore.getRandomUsers("suggested");
+    await $generalStore.getRandomUsers("following");
 
     if ($userStore.id) $userStore.getUser();
   } catch (error) {

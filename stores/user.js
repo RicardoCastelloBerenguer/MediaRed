@@ -51,6 +51,18 @@ export const useUserStore = defineStore("user", {
       this.$state.bio = "";
       this.$state.image = "";
     },
+    async createPost(data) {
+      return await $axios.post("/api/posts", data);
+    },
+    async updateUserImage(data) {
+      return await $axios.post("/api/update-user-image", data);
+    },
+    async updateUser(name, bio) {
+      return await $axios.patch("/api/update-user", {
+        name: name,
+        bio: bio,
+      });
+    },
   },
   persist: true,
 });

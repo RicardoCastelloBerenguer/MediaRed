@@ -2,6 +2,18 @@
   <div>
     <UploadError :error-type="errorType" />
 
+    <div
+      v-if="isUploading"
+      class="fixed flex items-center justify-center top-0 left-0 w-full h-screen bg-black z-50 bg-opacity-50"
+    >
+      <Icon
+        name="mingcute:loading-line"
+        size="100"
+        color="#FFFFFF"
+        class="animate-spin ml-1"
+      ></Icon>
+    </div>
+
     <UploadLayout>
       <section
         class="w-full mt-[80px] mb-[40px] bg-white shadow-lg rounded-md py-6 md:px-10 px-4"
@@ -137,10 +149,20 @@
               </button>
 
               <button
+                @click="createPost()"
                 class="px-10 py-2.5 mt-8 border text-[16px] text-white bg-[#F02C56] hover:bg-[#e3274b] rounded-sm"
               >
                 Subir
               </button>
+            </div>
+
+            <div v-if="errors" class="mt-4">
+              <span v-if="errors.video" class="text-red-500 block">
+                {{ errors.video[0] }}</span
+              >
+              <span v-if="errors.text" class="text-red-500 block">
+                {{ errors.text[0] }}</span
+              >
             </div>
           </div>
         </div>
@@ -151,6 +173,9 @@
 
 <script setup>
 import UploadLayout from "~/layouts/UploadLayout.vue";
+
+const { $userStore } = useNuxtApp();
+const router = useRouter();
 
 let file = ref(null);
 let fileDisplay = ref(null);
@@ -207,6 +232,32 @@ const discard = () => {
     fileDisplay.value = null;
     caption.value = "";
     fileData.value = null;
+    isUploading.value = false;
+  }
+};
+
+const createPost = async () => {
+  errors.value = null;
+
+  let data = new FormData();
+
+  data.append("video", fileData.value || "");
+  data.append("text", caption.value || "");
+
+  if (fileData.value && caption.value) {
+    isUploading.value = true;
+  }
+  try {
+    let response = await $userStore.createPost(data);
+
+    if ((response.status = 200)) {
+      setTimeout(() => {
+        router.push("/profile/" + $userStore.id);
+        isUploading.value = false;
+      }, 200);
+    }
+  } catch (error) {
+    errors.value = error.response.data.errors;
     isUploading.value = false;
   }
 };

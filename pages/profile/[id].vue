@@ -1,24 +1,27 @@
 <template>
   <MainLayout>
     <section
+      v-if="$profileStore.name"
       class="pt-[90px] 2xl:pl-[185px] lg:pl-[185px] xs:pl-[75px] pl-[220px] lg:pr-0 pr-2 w-[calc(100%-90px)] max-w-[1800px] mx-auto"
     >
       <div class="flex w-[calc(100vw-230px)]">
         <img
           class="max-w-[120px] max-h-[120px] rounded-full"
-          src="https:picsum.photos/300/320"
+          :src="$profileStore.image"
           alt=""
         />
 
         <div class="ml-5 w-full">
           <span class="text-[30px] font-bold truncate w-[300px] block">
-            Nombre usuario
+            {{ $generalStore.allLowerCaseNoCaps($profileStore.name) }}
           </span>
-          <span class="text-[18px] truncate block">Nombre usuario</span>
+          <span class="text-[18px] truncate block">
+            {{ $profileStore.name }}</span
+          >
 
           <button
             @click="$generalStore.isEditProfileOpen = true"
-            v-if="true"
+            v-if="$profileStore.id === $userStore.id"
             class="flex items-center rounded-md py-1.5 px-3.5 mt-3 text-[15px] font-semibold border hover:bg-gray-100"
           >
             <Icon name="mdi:pencil" class="mt-0.5 mr-1" size="18" />
@@ -56,10 +59,7 @@
       <p
         class="pt-4 mr-4 text-gray-500 font-light text-[15px] pl-1.5 max-w-[500px]"
       >
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam amet,
-        consequatur consequuntur corporis, deleniti dicta enim ex illum
-        laboriosam natus necessitatibus odio omnis possimus rerum sit voluptate
-        voluptates! Eaque, quibusdam.
+        {{ $profileStore.bio }}
       </p>
 
       <div class="w-full flex items-center pt-4 border-b">
@@ -81,26 +81,42 @@
         </div>
       </div>
 
-      <div
+      <section
         class="mt-4 grid 2xl:grid-cols-6 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-3"
       >
-        <UserPost />
-        <UserPost />
-        <UserPost />
-        <UserPost />
-        <UserPost />
-        <UserPost />
-        <UserPost />
-        <UserPost />
-      </div>
+        <div v-if="show" v-for="post in $profileStore.posts">
+          <UserPost :post="post" />
+        </div>
+      </section>
     </section>
   </MainLayout>
 </template>
 
 <script setup>
 import MainLayout from "~/layouts/MainLayout.vue";
+import { storeToRefs } from "pinia";
 
-const { $generalStore } = useNuxtApp();
+const { $userStore, $profileStore, $generalStore } = useNuxtApp();
+const { posts } = storeToRefs($profileStore);
+const route = useRoute();
+
+let show = ref(false);
+
+onMounted(async () => {
+  try {
+    await $profileStore.getProfile(route.params.id);
+  } catch (error) {
+    console.log(error);
+  }
+}),
+  watch(
+    () => posts.value,
+    () => {
+      setTimeout(() => {
+        show.value = true;
+      }, 150);
+    }
+  );
 </script>
 
 <style lang="scss" scoped></style>

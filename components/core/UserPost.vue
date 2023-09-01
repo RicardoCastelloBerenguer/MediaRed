@@ -1,5 +1,6 @@
 <template>
   <main
+    @click="displayPost(post)"
     class="relative brightness-90 hover:brightness-[1.1] cursor-pointer"
     @mouseenter="isHover(true)"
     @mouseleave="isHover(false)"
@@ -19,7 +20,7 @@
     <section class="">
       <nuxt-link to="/post/1">
         <video
-          src="/videos/seoul.mp4"
+          :src="post.video"
           class="aspect-[3/4] object-cover rounded-md"
           muted
           loop
@@ -29,9 +30,9 @@
     </section>
 
     <section class="px-1">
-      <span class="text-gray-700 text-[15px] pt-1 break-words"
-        >Texto de prueba Texto de prueba</span
-      >
+      <span class="text-gray-700 text-[15px] pt-1 break-words">
+        {{ post.text }}
+      </span>
       <div class="flex items-center -ml-1 text-gray-600 font-bold text-xs">
         <Icon name="gg:loadbar-sound" size="20" />
         <span>3%</span>
@@ -45,6 +46,8 @@
 const props = defineProps({
   post: Object,
 });
+
+const { $generalStore } = useNuxtApp();
 
 const route = useRoute();
 const router = useRouter();
@@ -75,5 +78,13 @@ const isHover = (bool) => {
   } else {
     video.value.pause();
   }
+};
+
+const displayPost = (post) => {
+  $generalStore.setBackUrl("/profile" + route.params.id);
+  $generalStore.selectedPost = null;
+  setTimeout(() => {
+    router.push(`/post/${post.id}`);
+  }, 150);
 };
 </script>

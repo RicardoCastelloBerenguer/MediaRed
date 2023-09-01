@@ -32,7 +32,7 @@
             <div class="flex items-center justify-center sm:-mt-6">
               <label for="image" class="relative cursor-pointer">
                 <img
-                  src="https:picsum.photos/id/8/300/320"
+                  :src="userImage"
                   alt="profile image"
                   width="95"
                   class="rounded-full"
@@ -72,10 +72,10 @@
             <div class="flex items-center justify-center sm:-mt-6">
               <div class="sm:w-[60%] w-full max-w-md">
                 <TextInput
-                  placeholder="Username"
+                  placeholder="username"
                   :auto-focus="true"
                   input-type="text"
-                  v-model="username"
+                  v-model:input="username"
                   max="30"
                 />
                 <p class="text-[11px] text-gray-400 mt-4">
@@ -100,13 +100,12 @@
             <div class="flex items-center justify-center sm:-mt-6">
               <div class="sm:w-[60%] w-full max-w-[md]">
                 <textarea
-                  class="resize-none w-full bg-[#f1f1f2] text-gray-800 border border-gray-300 rounded-md py-2.5 px-3 focus:outline-none"
-                  name=""
-                  id=""
                   cols="30"
                   rows="4"
                   v-model="userBio"
                   maxlength="80"
+                  placeholder="hola"
+                  class="resize-none w-full bg-[#F1F1F2] text-gray-800 border border-gray-300 rounded-md py-2.5 px-3 focus:outline-none"
                 ></textarea>
 
                 <div v-if="userBio" class="text-[11px] text-gray-500">
@@ -153,6 +152,24 @@
           </button>
 
           <button
+            :disabled="!isUpdated"
+            @click="updateUserInfo()"
+            class="flex items-center bg-[#f02c56] text-white border ml-3 px-3 py-[6px] rounded-md"
+            :class="!isUpdated ? 'bg-gray-200' : 'bg-[#F02C56]'"
+          >
+            <span class="text-[15px] px-2 font-medium">Apply</span>
+          </button>
+        </div>
+
+        <div v-else id="CropperButtons" class="flex items-center justify-end">
+          <button
+            @click="uploadedImage = null"
+            class="flex items-center border px-3 py-[6px] hover:bg-gray-100 rounded-md"
+          >
+            <span class="text-[15px] px-2 font-medium">Cancel</span>
+          </button>
+
+          <button
             @click="cropAndUpdateImage()"
             class="flex items-center bg-[#f02c56] text-white border ml-3 px-3 py-[6px] rounded-md"
           >
@@ -169,28 +186,31 @@ import { Cropper, CircleStencil } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css";
 
 let uploadedImage = ref(null);
-let userBio = ref("");
+let userBio = ref(null);
 let userImage = ref(null);
 let isUpdated = ref(false);
 let file = ref(null);
-let username = ref("");
+let username = ref(null);
 let crooper = ref(null);
 let UploadedImage = ref(null);
 
 const { $generalStore, $userStore, $profileStore } = useNuxtApp();
 
-const { name, bio, image } = storeToRefs($userStore);
+const { name, bio, image } = storeToRefs($profileStore);
+
+const route = useRoute();
 
 onMounted(() => {
-  (username.value = name.value),
-    (userBio.value = bio.value),
-    (userImage.value = image.value);
+  username.value = name.value;
+  userBio.value = bio.value;
+  userImage.value = image.value;
 });
 
 watch(
   () => username.value,
   () => {
-    if (!username || username.value === name.value) isUpdated.value = false;
+    if (!username.value || username.value === name.value)
+      isUpdated.value = false;
     else isUpdated.value = true;
   }
 );
@@ -198,16 +218,61 @@ watch(
 watch(
   () => userBio.value,
   () => {
-    if (!userBio || userBio.value.length === bio.value.length)
+    if (!username.value || userBio.value === bio.value) {
       isUpdated.value = false;
-    else isUpdated.value = true;
+    } else {
+      isUpdated.value = true;
+    }
   }
 );
-
 const getUploadedImage = (e) => {
   file.value = e.target.files[0];
   uploadedImage.value = URL.createObjectURL(file.value);
 };
 
-const cropAndUpdateImage = () => {};
+const cropAndUpdateImage = async () => {
+  const { coordinates } = crooper.value.getResult();
+
+  let data = new FormData();
+
+  data.append("image", file.value || "");
+  data.append("height", coordinates.height || "");
+  data.append("width", coordinates.width || "");
+  data.append("left", coordinates.left || "");
+  data.append("top", coordinates.top || "");
+
+  try {
+    await $userStore.updateUserImage(data);
+    await $userStore.getUser();
+    await $profileStore.getProfile(route.params.id);
+    await $generalStore.updateSideMenuImage(
+      $generalStore.suggested,
+      $userStore
+    );
+    await $generalStore.updateSideMenuImage(
+      $generalStore.following,
+      $userStore
+    );
+
+    userImage.value = image.value;
+    uploadedImage.value = null;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const updateUserInfo = async () => {
+  try {
+    await $userStore.updateUser(username.value, userBio.value);
+    await $userStore.getUser();
+    await $profileStore.getProfile(route.params.id);
+
+    username.value = name.value;
+    userBio.value = bio.value;
+
+    $generalStore.isEditProfileOpen = false;
+  } catch (error) {
+    console.log(error);
+  }
+};
 </script>

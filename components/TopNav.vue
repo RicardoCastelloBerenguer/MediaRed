@@ -87,7 +87,7 @@
             >
               <NuxtLink
                 @click="showMenu = false"
-                :to="`/perfil/${$userStore.id}`"
+                :to="`/profile/${$userStore.id}`"
                 class="flex items-center justify-start py-3 px-2 hover:bg-gray-100 cursor-pointer"
               >
                 <Icon name="ph:user" size="20"></Icon>
@@ -120,15 +120,14 @@ let showMenu = ref(false);
 onMounted(() => {
   document.addEventListener("mouseup", function (e) {
     let popupMenu = document.getElementById("PopupMenu");
-    console.log(popupMenu);
-    if (!popupMenu.contains(e.target)) {
+    /*if (!popupMenu.contains(e.target)) {
       showMenu.value = false;
-    }
+    }*/
   });
 });
 
 const isLoggedIn = () => {
-  if ($userStore.id) router.push("upload");
+  if ($userStore.id) router.push("/upload");
   else $generalStore.isLoginOpen = true;
 };
 

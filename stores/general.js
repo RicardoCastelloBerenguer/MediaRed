@@ -44,6 +44,26 @@ export const useGeneralStore = defineStore("general", {
         }
       );
     },
+    allLowerCaseNoCaps(string) {
+      return string.split(" ").join("").toLowerCase();
+    },
+    setBackUrl(url) {
+      this.isBackUrl = url;
+    },
+    async getRandomUsers(type) {
+      let res = await $axios.get("/api/get-random-users");
+
+      if (type === "suggested") this.suggested = res.data.suggested;
+      if (type === "following") this.following = res.data.following;
+    },
+    updateSideMenuImage(array, user) {
+      for (let i = 0; i < array.length; i++) {
+        let res = array[i];
+        if ((res.id = user.id)) {
+          res.image = user.image;
+        }
+      }
+    },
   },
   persist: true,
 });
