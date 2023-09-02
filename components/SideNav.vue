@@ -48,8 +48,17 @@
         Cuentas que sigues
       </h2>
 
-      <ul class="m-2 border-b border-gray-100 pb-3">
-        <li><AccountItemFollow name="Henry Cavill" verified="true" /></li>
+      <ul
+        v-if="$generalStore.following"
+        class="m-2 border-b border-gray-100 pb-3"
+      >
+        <li>
+          <AccountItemFollow
+            v-for="followingUser in $generalStore.following"
+            :user="followingUser"
+            :verified="true"
+          />
+        </li>
         <button
           class="lg:block hidden text-[#F02C56] pt-1.5 pl-2 text-[15px] font-semibold"
         >
@@ -63,8 +72,13 @@
         Cuentas recomendadas
       </h2>
 
-      <ul class="m-2 border-b border-gray-100 pb-3">
-        <li><AccountItemFollow name="Henry Cavill" verified="true" /></li>
+      <ul
+        v-if="$generalStore.suggested"
+        class="m-2 border-b border-gray-100 pb-3"
+      >
+        <li>
+          <AccountItemFollow :user="$generalStore.suggested[0]" />
+        </li>
         <button
           class="lg:block hidden text-[#F02C56] pt-1.5 pl-2 text-[15px] font-semibold"
         >
@@ -80,4 +94,7 @@ import MenuItem from "~/components/ui/MenuItem.vue";
 import AccountItemFollow from "~/components/ui/AccountItemFollow.vue";
 
 const route = useRoute();
+const router = useRouter();
+
+const { $generalStore, $userStore } = useNuxtApp();
 </script>

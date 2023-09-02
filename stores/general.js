@@ -20,6 +20,17 @@ export const useGeneralStore = defineStore("general", {
       if (switchStopScroll) document.body.style.overflow = "hidden";
       else document.body.style.overflow = "visible";
     },
+    async getRandomUsers(type) {
+      let res = await $axios.get("/api/get-random-users");
+
+      if (type === "suggested") this.suggested = res.data.suggested;
+      if (type === "following") this.following = res.data.following;
+    },
+    async getAllPosts() {
+      let res = await $axios.get("/api/home");
+
+      this.$state.posts = res.data;
+    },
     async hasSessionExpired() {
       await $axios.interceptors.response.use(
         (response) => {
@@ -50,16 +61,10 @@ export const useGeneralStore = defineStore("general", {
     setBackUrl(url) {
       this.isBackUrl = url;
     },
-    async getRandomUsers(type) {
-      let res = await $axios.get("/api/get-random-users");
-
-      if (type === "suggested") this.suggested = res.data.suggested;
-      if (type === "following") this.following = res.data.following;
-    },
     updateSideMenuImage(array, user) {
-      for (let i = 0; i < array.length - 1; i++) {
+      for (let i = 0; i <= array.length - 1; i++) {
         let res = array[i];
-        if ((res.id = user.id)) {
+        if (res.id === user.id) {
           res.image = user.image;
         }
       }

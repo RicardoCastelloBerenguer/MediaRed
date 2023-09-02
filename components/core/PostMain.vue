@@ -1,9 +1,9 @@
 <template>
-  <div id="PostMain" class="flex justify-center border-b py-6">
+  <div :id="`PostMain-${post.id}`" class="flex justify-center border-b py-6">
     <img
       class="cursor-pointer rounded-full mx-0 max-h-[60px]"
       width="60"
-      src="https:picsum.photos/300/320"
+      :src="post.user.image"
       alt=""
     />
 
@@ -11,12 +11,12 @@
       <div class="flex items-center justify-between pb-0.5">
         <button>
           <span class="font-bold hover:underline cursor-pointer">
-            {{ username }}
+            {{ $generalStore.allLowerCaseNoCaps(post.user.name) }}
           </span>
           <span
             class="text-[13px] text-light text-gray-500 pl-1 cursor-pointer"
           >
-            {{ name }}
+            {{ post.user.name }}
           </span>
         </button>
 
@@ -28,7 +28,7 @@
       </div>
 
       <p class="text-[15px] pb-0.5 break-words md:max-w-[440px] max-w-[300px]">
-        texto de ejemplo
+        {{ post.text }}
       </p>
 
       <div class="flex items-center gap-2">
@@ -50,16 +50,17 @@
         class="float items-center font-semibold text-[14px] pb-0.5 cursor-pointer hover:underline"
       >
         <Icon name="mdi:music" size="17"></Icon>
-        <span class="px-1">Sonido original - {{ name }}</span>
+        <span class="px-1">Sonido original - {{ post.user.name }}</span>
       </div>
 
       <div class="mt-2.5 flex">
         <div
+          @click="displayPost(post)"
           class="relative min-h-[480px] max-h-[550px] max-w-[260px] flex items-center bg-black rounded-xl cursor-pointer shadow-md"
         >
           <video
             ref="video"
-            src="/videos/seoul.mp4"
+            :src="post.video"
             loop
             muted
             class="rounded-xl object-cover mx-auto h-full"
@@ -78,11 +79,18 @@
             <div class="pb-4 text-center flex flex-col gap-2">
               <div class="flex flex-col">
                 <button
+                  @click="isLiked ? unlikePost() : likePost()"
                   class="rounded-full bg-gray-200 hover:bg-gray-300 p-2 cursor-pointer"
                 >
-                  <Icon name="mdi:heart" size="25" />
+                  <Icon
+                    name="mdi:heart"
+                    :color="isLiked ? '#F02C56' : ''"
+                    size="25"
+                  />
                 </button>
-                <span class="text-xs text-gray-800 font-semibold">34</span>
+                <span class="text-xs text-gray-800 font-semibold">
+                  {{ post.likes.length }}
+                </span>
               </div>
 
               <div class="flex flex-col">
@@ -114,16 +122,75 @@
 </template>
 
 <script setup>
+const router = useRouter();
+
 const props = defineProps({
-  username: String,
-  name: String,
+  post: {
+    Object,
+    required: true,
+  },
 });
+
+const { post } = toRefs(props);
+const { $userStore, $generalStore } = useNuxtApp();
+
+const isLiked = computed(() => {
+  return post.value.likes.find((like) => like.user_id === $userStore.id);
+});
+
+const likePost = async () => {
+  if (!$userStore.id) {
+    $generalStore.isLoginOpen = true;
+    return;
+  }
+  try {
+    await $userStore.likePost(post.value);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const unlikePost = async () => {
+  if (!$userStore.id) {
+    $generalStore.isLoginOpen = true;
+    return;
+  }
+  try {
+    await $userStore.unlikePost(post.value);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 let video = ref(null);
 
 onMounted(() => {
-  video.value.play();
+  let observer = new IntersectionObserver(
+    function (entries) {
+      if (entries[0].isIntersecting) {
+        video.value.play();
+      } else {
+        video.value.pause();
+      }
+    },
+    { threshold: [0.6] }
+  );
+
+  observer.observe(document.getElementById(`PostMain-${post.value.id}`));
+  //video.value.play();
 });
+
+onBeforeUnmount(() => {
+  video.value.pause();
+  video.value.currentTime = 0;
+  video.value.src = "";
+});
+
+const displayPost = () => {
+  $generalStore.setBackUrl("/");
+  $generalStore.selectedPost = null;
+  router.push(`/post/${post.value.id}`);
+};
 </script>
 
 <style lang="scss" scoped></style>

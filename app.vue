@@ -17,7 +17,9 @@ const { isLoginOpen, isEditProfileOpen } = storeToRefs($generalStore);
 
 onMounted(async () => {
   $generalStore.bodySwitch(false);
-  isLoginOpen.value = false;
+
+  if (!$userStore.id) isLoginOpen.value = true;
+  else isLoginOpen.value = false;
   isEditProfileOpen.value = false;
 
   try {
