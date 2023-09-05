@@ -81,7 +81,7 @@ const isHover = (bool) => {
 };
 
 const displayPost = (post) => {
-  $generalStore.setBackUrl("/profile" + route.params.id);
+  $generalStore.setBackUrl("/profile/" + route.params.id);
   $generalStore.selectedPost = null;
   setTimeout(() => {
     router.push(`/post/${post.id}`);

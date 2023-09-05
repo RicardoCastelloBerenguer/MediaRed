@@ -31,6 +31,12 @@ export const useGeneralStore = defineStore("general", {
 
       this.$state.posts = res.data;
     },
+    async getPostById(id) {
+      let res = await $axios.get(`/api/posts/${id}`);
+
+      this.$state.selectedPost = res.data.post[0];
+      this.$state.ids = res.data.ids;
+    },
     async hasSessionExpired() {
       await $axios.interceptors.response.use(
         (response) => {

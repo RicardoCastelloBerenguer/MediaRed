@@ -122,6 +122,8 @@
 </template>
 
 <script setup>
+let loadedLikeSubscription = ref(true);
+
 const router = useRouter();
 
 const props = defineProps({
@@ -134,34 +136,6 @@ const props = defineProps({
 const { post } = toRefs(props);
 const { $userStore, $generalStore } = useNuxtApp();
 
-const isLiked = computed(() => {
-  return post.value.likes.find((like) => like.user_id === $userStore.id);
-});
-
-const likePost = async () => {
-  if (!$userStore.id) {
-    $generalStore.isLoginOpen = true;
-    return;
-  }
-  try {
-    await $userStore.likePost(post.value);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const unlikePost = async () => {
-  if (!$userStore.id) {
-    $generalStore.isLoginOpen = true;
-    return;
-  }
-  try {
-    await $userStore.unlikePost(post.value);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 let video = ref(null);
 
 onMounted(() => {
@@ -170,7 +144,7 @@ onMounted(() => {
       if (entries[0].isIntersecting) {
         video.value.play();
       } else {
-        video.value.pause();
+        if (video && video.value) video.value.pause();
       }
     },
     { threshold: [0.6] }
@@ -185,6 +159,48 @@ onBeforeUnmount(() => {
   video.value.currentTime = 0;
   video.value.src = "";
 });
+
+const isLiked = computed(() => {
+  return post.value.likes.find((like) => like.user_id === $userStore.id);
+});
+
+const likePost = async () => {
+  console.log(loadedLikeSubscription.value);
+  if (loadedLikeSubscription.value) {
+    loadedLikeSubscription.value = false;
+    if (!$userStore.id) {
+      $generalStore.isLoginOpen = true;
+      loadedLikeSubscription.value = true;
+      return;
+    }
+    try {
+      await $userStore.likePost(post.value);
+      loadedLikeSubscription.value = true;
+    } catch (error) {
+      console.log(error);
+      loadedLikeSubscription.value = true;
+    }
+    //
+  }
+};
+
+const unlikePost = async () => {
+  if (loadedLikeSubscription.value) {
+    loadedLikeSubscription.value = false;
+    if (!$userStore.id) {
+      $generalStore.isLoginOpen = true;
+      loadedLikeSubscription.value = true;
+      return;
+    }
+    try {
+      await $userStore.unlikePost(post.value);
+      loadedLikeSubscription.value = true;
+    } catch (error) {
+      console.log(error);
+      //loadedLikeSubscription.value = true;
+    }
+  }
+};
 
 const displayPost = () => {
   $generalStore.setBackUrl("/");
