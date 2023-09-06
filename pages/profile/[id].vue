@@ -52,7 +52,8 @@
           ><span class="font-bold">121.2 K</span> Seguidores</span
         >
         <span class="text-[15px] pl-1.5 font-light text-gray-500">
-          <span class="font-bold">7M</span> Me gusta</span
+          <span class="font-bold">{{ $profileStore.allLikes }}</span> Me
+          gusta</span
         >
       </div>
 

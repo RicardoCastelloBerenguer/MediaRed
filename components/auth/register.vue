@@ -63,18 +63,9 @@ let password = ref(null);
 let confirmPassword = ref(null);
 let errors = ref(null);
 
-watch(
-  () => email.value,
-  () => {
-    console.log(email.value);
-  }
-);
-
 const register = async () => {
   try {
     await $userStore.getTokens();
-
-    console.log(password.value + " | " + confirmPassword.value);
 
     await $userStore.register(
       name.value,

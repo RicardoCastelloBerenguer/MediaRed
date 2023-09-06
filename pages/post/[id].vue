@@ -7,7 +7,18 @@
       v-if="$generalStore.selectedPost"
       class="lg:w-[calc(100%-540px)] w-auto h-full relative"
     >
-      <nuxt-link
+      <button
+        @click="goBackUrl()"
+        class="absolute z-20 m-5 rounded-full bg-gray-700 p-1.5 hover:bg-gray-800"
+      >
+        <Icon
+          name="material-symbols:close"
+          color="#ffffff"
+          size="27"
+          class=""
+        />
+      </button>
+      <!-- <nuxt-link
         :to="$generalStore.isBackUrl"
         class="absolute z-20 m-5 rounded-full bg-gray-700 p-1.5 hover:bg-gray-800"
       >
@@ -17,11 +28,11 @@
           size="27"
           class=""
         />
-      </nuxt-link>
+      </nuxt-link> -->
 
       <div v-if="$generalStore.ids.length > 1">
         <button
-          :disabled="isLoaded"
+          :disabled="!isLoaded"
           @click="loopThroughPostsUp()"
           class="absolute z-20 right-4 top-4 flex items-center justify-center rounded-full bg-gray-700"
         >
@@ -29,7 +40,7 @@
         </button>
 
         <button
-          :disabled="isLoaded"
+          :disabled="!isLoaded"
           @click="loopThroughPostsDown()"
           class="absolute z-20 right-4 top-20 flex items-center justify-center rounded-full bg-gray-700"
         >
@@ -56,15 +67,29 @@
         />
       </div>
 
-      <div class="h-screen mx-auto bg-black bg-opacity-70 lg:min-w-[480px]">
+      <div
+        class="h-screen mx-auto bg-black bg-opacity-70 lg:min-w-[480px] relative"
+      >
         <video
           v-if="$generalStore.selectedPost.video"
           :src="$generalStore.selectedPost.video"
           class="h-screen mx-auto"
-          muted
+          :muted="$generalStore.postPageMuted"
           loop
           ref="video"
         ></video>
+        <button v-if="isLoaded" @click="toggleMuted()">
+          <Icon
+            :name="
+              $generalStore.postPageMuted
+                ? 'teenyicons:sound-off-outline'
+                : 'teenyicons:sound-on-outline'
+            "
+            size="30"
+            color="#ffffff"
+            class="absolute left-[30px] bottom-[30px]"
+          />
+        </button>
       </div>
     </section>
 
@@ -105,7 +130,7 @@
           <Icon
             v-if="$userStore.id === $generalStore.selectedPost.user.id"
             @click="deletePost()"
-            class="cursor-pointer"
+            class="cursor-pointer mr-5"
             size="25"
             name="material-symbols:delete-outline-sharp"
           />
@@ -149,7 +174,9 @@
                 class=""
               />
             </button>
-            <span class="text-xs pl-2 pr-4 text-gray-800 font-bold">67</span>
+            <span class="text-xs pl-2 pr-4 text-gray-800 font-bold">{{
+              $generalStore.selectedPost.comments.length
+            }}</span>
           </div>
         </div>
       </section>
@@ -187,9 +214,7 @@
 
                   <Icon
                     v-if="$userStore.id === comment.user.id"
-                    @click="
-                      deleteComment($generalStore.selectedPost, comment.id)
-                    "
+                    @click="deleteComment(comment, $generalStore.selectedPost)"
                     name="material-symbols:delete-outline-sharp"
                     size="25"
                     class="cursor-pointer"
@@ -243,11 +268,14 @@
 const route = useRoute();
 const router = useRouter();
 
+definePageMeta({ middleware: "auth" });
+
 let comment = ref("");
 let inputFocused = ref(null);
 let video = ref(null);
 let isLoaded = ref(false);
 let loadedLikeSubscription = ref(true);
+let showMuted = ref(false);
 
 const { $userStore, $generalStore, $profileStore } = useNuxtApp();
 
@@ -256,15 +284,12 @@ onMounted(async () => {
 
   try {
     await $generalStore.getPostById(route.params.id);
-    console.log($generalStore.selectedPost.comments);
   } catch (error) {
     console.log(error);
-    if (error) {
-      router.push("/profile/6");
+    if (error && error.response.status === 400) {
+      // router.push($generalStore.isBackUrl);
     }
   }
-
-  console.log(video.value);
 
   video.value.addEventListener("loadeddata", (e) => {
     if (e.target) {
@@ -283,16 +308,6 @@ onBeforeUnmount(() => {
   }
 });
 
-onBeforeRouteUpdate((to, from, next) => {
-  // Pausar el video antes de cambiar de ruta
-  if (video && video.value) {
-    video.value.pause();
-    video.value.currentTime = 0;
-    video.value.src = "";
-  }
-  next();
-});
-
 watch(
   () => isLoaded.value,
   () => {
@@ -302,7 +317,16 @@ watch(
   }
 );
 
-const deleteComment = () => {};
+//COMMENT FUNCTIONS CALLING TO AXIOS REQUESTS
+
+const deleteComment = async (comment, post) => {
+  let res = confirm("Are you sure you want to delete this comment?");
+  try {
+    if (res) await $userStore.deleteComment(comment, post);
+  } catch (error) {
+    console.log(error);
+  }
+};
 const addComment = async () => {
   try {
     await $userStore.createComment($generalStore.selectedPost, comment.value);
@@ -313,6 +337,8 @@ const addComment = async () => {
   }
 };
 
+//LIKE FUNCTIONS CALLING TO AXIOS REQUESTS
+
 const isLiked = computed(() => {
   return $generalStore.selectedPost.likes.find(
     (like) => like.user_id === $userStore.id
@@ -320,7 +346,6 @@ const isLiked = computed(() => {
 });
 
 const likePost = async () => {
-  console.log(loadedLikeSubscription.value);
   if (loadedLikeSubscription.value) {
     loadedLikeSubscription.value = false;
     try {
@@ -331,6 +356,19 @@ const likePost = async () => {
       loadedLikeSubscription.value = true;
     }
     //
+  }
+};
+
+const deletePost = async () => {
+  let res = confirm("Are you sure you want to delete this post?");
+  try {
+    if (res) {
+      await $userStore.deletePost($generalStore.selectedPost);
+      //await $userStore.getProfile($userStore.id);
+      router.push($generalStore.isBackUrl);
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -345,6 +383,45 @@ const unlikePost = async () => {
       //loadedLikeSubscription.value = true;
     }
   }
+};
+
+const loopThroughPostsDown = () => {
+  let postIdsFromUserReversed = $generalStore.ids.reverse();
+  let found = false;
+
+  for (let i = 0; i < postIdsFromUserReversed.length; i++) {
+    let id = postIdsFromUserReversed[i];
+    if (id < route.params.id) {
+      router.push(`/post/${id}`);
+      found = true;
+      return;
+    }
+  }
+
+  if (!found) router.push(`/post/${postIdsFromUserReversed[0]}`);
+};
+
+const loopThroughPostsUp = () => {
+  let found = false;
+
+  for (let i = 0; i < $generalStore.ids.length; i++) {
+    let id = $generalStore.ids[i];
+    if (id > route.params.id) {
+      router.push(`/post/${id}`);
+      found = true;
+      return;
+    }
+  }
+
+  if (!found) router.push(`/post/${$generalStore.ids[0]}`);
+};
+
+const toggleMuted = () => {
+  $generalStore.togglePostPageMuted();
+};
+const goBackUrl = () => {
+  router.push(`${$generalStore.isBackUrl}`);
+  $generalStore.togglePostPageMuted();
 };
 </script>
 <style lang="scss" scoped></style>

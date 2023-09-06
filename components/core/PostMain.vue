@@ -1,12 +1,13 @@
 <template>
   <div :id="`PostMain-${post.id}`" class="flex justify-center border-b py-6">
-    <img
-      class="cursor-pointer rounded-full mx-0 max-h-[60px]"
-      width="60"
-      :src="post.user.image"
-      alt=""
-    />
-
+    <nuxt-link :to="`profile/${post.user.id}`">
+      <img
+        class="cursor-pointer rounded-full mx-0 max-h-[60px]"
+        width="60"
+        :src="post.user.image"
+        alt=""
+      />
+    </nuxt-link>
     <div class="pl-3 w-[calc(60%)] px-4">
       <div class="flex items-center justify-between pb-0.5">
         <button>
@@ -99,7 +100,9 @@
                 >
                   <Icon name="tabler:message" size="25" />
                 </button>
-                <span class="text-xs text-gray-800 font-semibold">34</span>
+                <span class="text-xs text-gray-800 font-semibold">{{
+                  post.comments.length
+                }}</span>
               </div>
 
               <button
@@ -112,6 +115,19 @@
                 class="rounded-full bg-gray-200 hover:bg-gray-300 p-2 cursor-pointer"
               >
                 <Icon name="ph:share-bold" size="25" />
+              </button>
+
+              <button class="mt-2 mb-2" @click="toggleMuted()">
+                <Icon
+                  :name="
+                    muted
+                      ? 'teenyicons:sound-off-outline'
+                      : 'teenyicons:sound-on-outline'
+                  "
+                  size="30"
+                  color="#F02C56"
+                  class=""
+                />
               </button>
             </div>
           </div>
@@ -137,6 +153,7 @@ const { post } = toRefs(props);
 const { $userStore, $generalStore } = useNuxtApp();
 
 let video = ref(null);
+let muted = ref(true);
 
 onMounted(() => {
   let observer = new IntersectionObserver(
@@ -165,7 +182,6 @@ const isLiked = computed(() => {
 });
 
 const likePost = async () => {
-  console.log(loadedLikeSubscription.value);
   if (loadedLikeSubscription.value) {
     loadedLikeSubscription.value = false;
     if (!$userStore.id) {
@@ -203,9 +219,16 @@ const unlikePost = async () => {
 };
 
 const displayPost = () => {
-  $generalStore.setBackUrl("/");
-  $generalStore.selectedPost = null;
-  router.push(`/post/${post.value.id}`);
+  if ($userStore.id) {
+    $generalStore.setBackUrl("/");
+    $generalStore.selectedPost = null;
+    router.push(`/post/${post.value.id}`);
+  } else $generalStore.isLoginOpen = true;
+};
+
+const toggleMuted = () => {
+  video.value.muted = !video.value.muted;
+  muted.value = video.value.muted;
 };
 </script>
 

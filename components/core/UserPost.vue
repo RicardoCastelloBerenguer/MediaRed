@@ -18,7 +18,7 @@
     </section>
 
     <section class="">
-      <nuxt-link to="/post/1">
+      <nuxt-link :to="`/post/${post.id}`">
         <video
           :src="post.video"
           class="aspect-[3/4] object-cover rounded-md"

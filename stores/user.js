@@ -71,15 +71,8 @@ export const useUserStore = defineStore("user", {
     async createPost(data) {
       return await $axios.post("/api/posts", data);
     },
-    async createComment(post, comment) {
-      let res = await $axios.post("/api/comments", {
-        post_id: post.id,
-        comment: comment,
-      });
-
-      if (res.status === 200) {
-        await this.updateComments(post);
-      }
+    async deletePost(post) {
+      return await $axios.delete(`/api/posts/${post.id}`);
     },
     async likePost(post) {
       const newLike = {
@@ -95,7 +88,6 @@ export const useUserStore = defineStore("user", {
           post_id: post.id,
         })
         .then((res) => {
-          console.log(res.data.like);
           post.likes.splice(post.likes.length - 1, 1);
           post.likes.push(res.data.like);
         })
@@ -120,7 +112,18 @@ export const useUserStore = defineStore("user", {
       }
     },
 
-    //UPDATE AXIOS FUNCTIONS
+    //COMMENT AXIOS FUNCTIONS
+
+    async createComment(post, comment) {
+      let res = await $axios.post("/api/comments", {
+        post_id: post.id,
+        comment: comment,
+      });
+
+      if (res.status === 200) {
+        await this.updateComments(post);
+      }
+    },
 
     async updateComments(post) {
       let res = await $axios.get(`api/profile/${post.user.id}`);
@@ -131,6 +134,14 @@ export const useUserStore = defineStore("user", {
         if (post.id === updatePost.id) {
           useGeneralStore().selectedPost.comments = updatePost.comments;
         }
+      }
+    },
+
+    async deleteComment(comment, post) {
+      let res = await $axios.delete(`api/comments/${comment.id}`);
+
+      if (res.status === 200) {
+        this.updateComments(post);
       }
     },
 

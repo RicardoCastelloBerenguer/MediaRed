@@ -23,8 +23,19 @@ export const useProfileStore = defineStore("profile", {
       this.$state.bio = res.data.user[0].bio;
       this.$state.image = res.data.user[0].image;
       this.$state.posts = res.data.posts;
+      this.getAllLikesOfProfile();
     },
+    getAllLikesOfProfile() {
+      this.$state.allLikes = 0;
 
+      for (let i = 0; i < this.posts.length; i++) {
+        const post = this.posts[i];
+
+        for (let j = 0; j < post.likes.length; j++) {
+          this.$state.allLikes++;
+        }
+      }
+    },
     resetUser() {
       this.$state.id = "";
       this.$state.name = "";

@@ -14,6 +14,7 @@ export const useGeneralStore = defineStore("general", {
     posts: null,
     suggested: null,
     following: null,
+    postPageMuted: true,
   }),
   actions: {
     bodySwitch(switchStopScroll) {
@@ -74,6 +75,9 @@ export const useGeneralStore = defineStore("general", {
           res.image = user.image;
         }
       }
+    },
+    togglePostPageMuted() {
+      this.$state.postPageMuted = !this.$state.postPageMuted;
     },
   },
   persist: true,

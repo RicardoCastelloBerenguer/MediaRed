@@ -16,4 +16,7 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
+  router: {
+    middleware: ["auth"], // Agrega aquí el middleware 'auth'
+  },
 });
