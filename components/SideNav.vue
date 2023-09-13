@@ -49,7 +49,7 @@
       </h2>
 
       <ul
-        v-if="$generalStore.following"
+        v-if="$generalStore.following && $userStore.id"
         class="m-2 border-b border-gray-100 pb-3"
       >
         <li>
@@ -73,7 +73,7 @@
       </h2>
 
       <ul
-        v-if="$generalStore.suggested"
+        v-if="$generalStore.suggested && $userStore.id"
         class="m-2 border-b border-gray-100 pb-3"
       >
         <li>

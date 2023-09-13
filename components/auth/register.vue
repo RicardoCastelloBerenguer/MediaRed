@@ -48,7 +48,14 @@
           "
           class="w-full text-[17px] font-semibold text-white py-3 rounded-sm"
         >
-          Sign up
+          <span v-if="loadedRegister">Register</span>
+          <Icon
+            v-else
+            name="mingcute:loading-line"
+            size="30"
+            color="#FFFFFF"
+            class="animate-spin ml-1 w-full"
+          />
         </button>
       </div>
     </div>
@@ -62,9 +69,11 @@ let email = ref(null);
 let password = ref(null);
 let confirmPassword = ref(null);
 let errors = ref(null);
+let loadedRegister = ref(true);
 
 const register = async () => {
   try {
+    loadedRegister.value = false;
     await $userStore.getTokens();
 
     await $userStore.register(
@@ -75,9 +84,12 @@ const register = async () => {
     );
     await $userStore.getUser();
 
+    loadedRegister.value = true;
+
     $generalStore.isLoginOpen = false;
   } catch (error) {
     console.log(error);
+    loadedRegister.value = true;
     errors.value = error.response.data.errors;
   }
 };

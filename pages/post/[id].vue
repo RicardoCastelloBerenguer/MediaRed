@@ -128,11 +128,21 @@
           </div>
 
           <Icon
-            v-if="$userStore.id === $generalStore.selectedPost.user.id"
+            v-if="
+              $userStore.id === $generalStore.selectedPost.user.id &&
+              loadedDeletedPost
+            "
             @click="deletePost()"
             class="cursor-pointer mr-5"
             size="25"
             name="material-symbols:delete-outline-sharp"
+          />
+          <Icon
+            v-else-if="$userStore.id === $generalStore.selectedPost.user.id"
+            name="mingcute:loading-line"
+            size="25"
+            color="#F02C56"
+            class="animate-spin mr-5"
           />
         </div>
 
@@ -247,6 +257,7 @@
             v-model="comment"
             @focus="inputFocused = true"
             @blur="inputFocused = false"
+            :disabled="!loadedCommentPost"
             class="bg-[#f1f1f2] text-[14px] focus:outline-none w-full lg:max-w-[420px] p-2 rounded-lg"
             placeholder="Añade un comentario"
             type="text"
@@ -255,10 +266,17 @@
         <button
           @click="addComment()"
           :disabled="!comment"
-          class="font-semibold text-sm ml-5 border rounded-lg p-2.5 cursor-pointer hover:bg-[#f8f8fcfa]"
+          class="font-semibold text-sm ml-5 border rounded-lg p-2.5 cursor-pointer hover:bg-[#f8f8fcfa] flex items-center justify-center"
           :class="comment ? 'text-[#f02c56] cursor-pointer' : 'text-gray-400'"
         >
-          Post
+          <span v-if="loadedCommentPost">Post</span>
+          <Icon
+            v-else
+            name="mingcute:loading-line"
+            size="30"
+            color="#F02C56"
+            class="animate-spin ml-1 w-full mr-1"
+          />
         </button>
       </section>
     </section>
@@ -276,6 +294,8 @@ let video = ref(null);
 let isLoaded = ref(false);
 let loadedLikeSubscription = ref(true);
 let showMuted = ref(false);
+let loadedDeletedPost = ref(true);
+let loadedCommentPost = ref(true);
 
 const { $userStore, $generalStore, $profileStore } = useNuxtApp();
 
@@ -329,10 +349,13 @@ const deleteComment = async (comment, post) => {
 };
 const addComment = async () => {
   try {
+    loadedCommentPost.value = false;
     await $userStore.createComment($generalStore.selectedPost, comment.value);
+    loadedCommentPost.value = true;
     comment.value = "";
     document.getElementById("Comments").scroll({ top: 0, behaviour: "smooth" });
   } catch (error) {
+    loadedCommentPost.value = true;
     console.log(error);
   }
 };
@@ -363,8 +386,10 @@ const deletePost = async () => {
   let res = confirm("Are you sure you want to delete this post?");
   try {
     if (res) {
+      loadedDeletedPost.value = false;
       await $userStore.deletePost($generalStore.selectedPost);
       //await $userStore.getProfile($userStore.id);
+      loadedDeletedPost.value = true;
       router.push($generalStore.isBackUrl);
     }
   } catch (error) {

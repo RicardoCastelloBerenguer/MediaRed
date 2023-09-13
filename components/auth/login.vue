@@ -27,7 +27,14 @@
           @click="login()"
           class="w-full text-[17px] font-semibold text-white py-3 rounded-sm"
         >
-          Login
+          <span v-if="loadedLogin">Login</span>
+          <Icon
+            v-else
+            name="mingcute:loading-line"
+            size="30"
+            color="#FFFFFF"
+            class="animate-spin ml-1 w-full"
+          />
         </button>
       </div>
     </div>
@@ -39,6 +46,7 @@ const { $userStore, $generalStore } = useNuxtApp();
 let email = ref(null);
 let password = ref(null);
 let errors = ref(null);
+let loadedLogin = ref(true);
 
 watch(
   () => email.value,
@@ -49,15 +57,19 @@ watch(
 
 const login = async () => {
   try {
+    loadedLogin.value = false;
     errors.value = null;
 
     await $userStore.getTokens();
     await $userStore.login(email.value, password.value);
     await $userStore.getUser();
 
+    loadedLogin.value = true;
+
     $generalStore.isLoginOpen = false;
   } catch (error) {
     console.log(error);
+    loadedLogin.value = true;
     errors.value = error.response.data.errors;
   }
 };
