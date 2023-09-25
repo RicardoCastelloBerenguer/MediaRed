@@ -42,19 +42,19 @@
         </li>
       </ul>
 
-      <h2
-        class="lg:block hidden text-s text-gray-600 m-3 font-semibold pt-4 pb-2 px-2"
-      >
-        Cuentas que sigues
-      </h2>
-
-      <ul
+      <!-- <ul
         v-if="$generalStore.following && $userStore.id"
         class="m-2 border-b border-gray-100 pb-3"
       >
-        <li>
+        <h2
+          class="lg:block hidden text-s text-gray-600 m-3 font-semibold pt-4 pb-2 px-2"
+        >
+          Cuentas que sigues
+        </h2>
+
+        <li v-for="followingUser in $generalStore.following">
           <AccountItemFollow
-            v-for="followingUser in $generalStore.following"
+            v-if="followingUser.id !== $userStore.id"
             :user="followingUser"
             :verified="true"
           />
@@ -64,7 +64,7 @@
         >
           Ver todas
         </button>
-      </ul>
+      </ul> -->
 
       <h2
         class="lg:block hidden text-s text-gray-600 m-3 font-semibold pt-4 pb-2 px-2"
@@ -73,11 +73,14 @@
       </h2>
 
       <ul
-        v-if="$generalStore.suggested && $userStore.id"
+        v-if="$generalStore.suggested"
         class="m-2 border-b border-gray-100 pb-3"
       >
-        <li>
-          <AccountItemFollow :user="$generalStore.suggested[0]" />
+        <li v-for="suggestedUser in $generalStore.suggested">
+          <AccountItemFollow
+            v-if="suggestedUser.id !== $userStore.id"
+            :user="suggestedUser"
+          />
         </li>
         <button
           class="lg:block hidden text-[#F02C56] pt-1.5 pl-2 text-[15px] font-semibold"

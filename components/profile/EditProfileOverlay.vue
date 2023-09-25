@@ -10,7 +10,7 @@
       <div
         class="absolute flex items-center justify-between w-full p-5 left-0 top-0 border-b border-b-gray-300"
       >
-        <span class="text-[22px] font-medium block">Edit Profile</span>
+        <span class="text-[22px] font-medium block">Editar Perfil</span>
         <button @click="$generalStore.isEditProfileOpen = false" class="">
           <Icon name="mdi:close" size="25" />
         </button>
@@ -27,7 +27,7 @@
           >
             <label
               class="sm:text-left text-center font-semibold text-[15px] sm:mb-0 mb-1 text-gray-700 sm:w-[160px]"
-              >Profile Photo</label
+              >Foto de perfil</label
             >
             <div class="flex items-center justify-center sm:-mt-6">
               <label for="image" class="relative cursor-pointer">
@@ -66,7 +66,7 @@
           >
             <label
               class="font-semibold text-[15px] sm:mb-0 text-gray-700 sm:w-[160px] sm:text-left text-center"
-              >Username
+              >Nombre de usuario
             </label>
 
             <div class="flex items-center justify-center sm:-mt-6">
@@ -79,9 +79,10 @@
                   max="30"
                 />
                 <p class="text-[11px] text-gray-400 mt-4">
-                  Usernames can only contain letters, numbers, underscores and
-                  periods. <br />
-                  Changing your username will also change your profile link
+                  Nombres de usuario solo pueden contener letras, numeros ,
+                  guiones bajos y puntos.<br />
+                  cambiar tu nombre de usuario también cambiará el link de tu
+                  perfil.
                 </p>
               </div>
             </div>
@@ -94,7 +95,7 @@
             <span
               class="font-semibold text[15px] sm:mb-0 mb-1 text-gray-700 sm:w-[160px] sm:text-left text-center"
             >
-              Bio
+              Biografía
             </span>
 
             <div class="flex items-center justify-center sm:-mt-6">
@@ -148,7 +149,7 @@
             @click="$generalStore.isEditProfileOpen = false"
             class="flex items-center border px-3 py-[6px] hover:bg-gray-100 rounded-md"
           >
-            <span class="text-[15px] px-2 font-medium">Cancel</span>
+            <span class="text-[15px] px-2 font-medium">Cancelar</span>
           </button>
 
           <button
@@ -157,7 +158,7 @@
             class="flex items-center bg-[#f02c56] text-white border ml-3 px-3 py-[6px] rounded-md"
             :class="!isUpdated ? 'bg-gray-200' : 'bg-[#F02C56]'"
           >
-            <span class="text-[15px] px-2 font-medium">Apply</span>
+            <span class="text-[15px] px-2 font-medium">Aplicar</span>
           </button>
         </div>
 
@@ -166,14 +167,14 @@
             @click="uploadedImage = null"
             class="flex items-center border px-3 py-[6px] hover:bg-gray-100 rounded-md"
           >
-            <span class="text-[15px] px-2 font-medium">Cancel</span>
+            <span class="text-[15px] px-2 font-medium">Cancelar</span>
           </button>
 
           <button
             @click="cropAndUpdateImage()"
             class="flex items-center bg-[#f02c56] text-white border ml-3 px-3 py-[6px] rounded-md"
           >
-            <span class="text-[15px] px-2 font-medium">Apply</span>
+            <span class="text-[15px] px-2 font-medium">Aplicar</span>
           </button>
         </div>
       </section>

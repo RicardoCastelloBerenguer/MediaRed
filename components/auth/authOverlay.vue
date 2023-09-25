@@ -19,14 +19,14 @@
         class="absolute flex items-center justify-center py-5 left-0 bottom-0 border-t w-full"
       >
         <span class="text-[14px] text-gray-600 mr-2"
-          >You don't have an account?</span
+          >No tienes una cuenta?</span
         >
         <button
           @click="isRegister = !isRegister"
           class="text-[14px] text-[#f02c56] font-semibold pl-1"
         >
-          <span v-if="!isRegister">Sign up</span>
-          <span v-else>Log in</span>
+          <span v-if="!isRegister">Registrarse</span>
+          <span v-else>Iniciar sesión</span>
         </button>
       </div>
       <register v-if="isRegister" />

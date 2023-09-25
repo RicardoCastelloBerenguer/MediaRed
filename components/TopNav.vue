@@ -48,7 +48,7 @@
           v-if="!$userStore.id"
           class="flex items-center bg-[#F02C56] text-white border rounded-lg px-3 py-[6px] ml-3"
         >
-          <span class="mx-3 font-medium text-[15px]">Log in</span>
+          <span class="mx-3 font-medium text-[15px]">Iniciar sesión</span>
         </button>
 
         <!--
